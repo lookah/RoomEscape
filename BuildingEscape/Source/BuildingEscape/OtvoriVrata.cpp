@@ -20,14 +20,18 @@ void UOtvoriVrata::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Akcija otvaranja vrata"))
+	AktorKojiOtvara = GetWorld()->GetFirstPlayerController()->GetPawn();
+		
+}
 
+void UOtvoriVrata::OtvoriVrata()
+{
 	// nadji vlasnika aktora
 	AActor* Owner = GetOwner();
 
 	//set the rotatior
-	FRotator NovaRotacija = FRotator(0.0f, -78.0f, 0.0f);
-	
+	FRotator NovaRotacija = FRotator(0.0f, -88.0f, 0.0f);
+
 	// set the door rotation
 	Owner->SetActorRotation(NovaRotacija);
 }
@@ -38,6 +42,10 @@ void UOtvoriVrata::TickComponent( float DeltaTime, ELevelTick TickType, FActorCo
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	// ...
+	// provjeri da li je aktor stao na paletu pritiska
+	if (PaletaPritiska->IsOverlappingActor(AktorKojiOtvara)) 
+	{	
+		OtvoriVrata();
+	}
 }
 
