@@ -21,6 +21,10 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
-		
-	
+private:
+	UPROPERTY(VisibleAnywhere)
+	float KutOtvaranja = 90.0f;
+
+	UPROPERTY(EditAnywhere)
+	ATriggerVolume* PaletaPritiska;
 };
