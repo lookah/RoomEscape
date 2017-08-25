@@ -19,16 +19,23 @@ public:
 	virtual void BeginPlay() override;
 
 	void OtvoriVrata();
+	void ZatvoriVrata();
 	
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
 private:
 	UPROPERTY(VisibleAnywhere)
-	float KutOtvaranja = 90.0f;
+	float KutOtvaranja = -90.0f;
 
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PaletaPritiska;
 
+	UPROPERTY(EditAnywhere)
+	float DoorCloseDelay = 2.0f;
+
+	float LastDoorOpenTime;
+
 	AActor* AktorKojiOtvara;
+	AActor* Owner;
 };

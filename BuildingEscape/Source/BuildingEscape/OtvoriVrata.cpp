@@ -19,6 +19,7 @@ UOtvoriVrata::UOtvoriVrata()
 void UOtvoriVrata::BeginPlay()
 {
 	Super::BeginPlay();
+	Owner = GetOwner();
 
 	AktorKojiOtvara = GetWorld()->GetFirstPlayerController()->GetPawn();
 		
@@ -26,14 +27,15 @@ void UOtvoriVrata::BeginPlay()
 
 void UOtvoriVrata::OtvoriVrata()
 {
-	// nadji vlasnika aktora
-	AActor* Owner = GetOwner();
+	// set the door rotation
+	Owner->SetActorRotation(FRotator(0.0f, KutOtvaranja, 0.0f));
+}
 
-	//set the rotatior
-	FRotator NovaRotacija = FRotator(0.0f, -88.0f, 0.0f);
+void UOtvoriVrata::ZatvoriVrata()
+{
 
 	// set the door rotation
-	Owner->SetActorRotation(NovaRotacija);
+	Owner->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
 }
 
 
@@ -46,6 +48,14 @@ void UOtvoriVrata::TickComponent( float DeltaTime, ELevelTick TickType, FActorCo
 	if (PaletaPritiska->IsOverlappingActor(AktorKojiOtvara)) 
 	{	
 		OtvoriVrata();
+		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
 	}
+
+	if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime > DoorCloseDelay)
+	{
+		ZatvoriVrata();
+	}
+
+	GetWorld()->GetTimeSeconds();
 }
 
