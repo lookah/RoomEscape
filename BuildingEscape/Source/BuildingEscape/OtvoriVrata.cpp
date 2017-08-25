@@ -25,35 +25,19 @@ void UOtvoriVrata::BeginPlay()
 		
 }
 
-void UOtvoriVrata::OtvoriVrata()
-{
-	// set the door rotation
-	Owner->SetActorRotation(FRotator(0.0f, KutOtvaranja, 0.0f));
-}
-
-void UOtvoriVrata::ZatvoriVrata()
-{
-
-	// set the door rotation
-	Owner->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
-}
-
 
 // Called every frame
-void UOtvoriVrata::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
+void UOtvoriVrata::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (GetTotalMassOfActorOnPlate() > 25.0f) // TODO Make into a parameter 
-	{	
-		UE_LOG(LogTemp, Warning, TEXT("Otvaram vrata"))
-		OtvoriVrata();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
-	}
-
-	if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime > DoorCloseDelay)
+	if (GetTotalMassOfActorOnPlate() > TriggerMass) // TODO Make into a parameter 
 	{
-		ZatvoriVrata();
+		OnOpen.Broadcast();
+	}
+	else
+	{
+		OnClose.Broadcast();
 	}
 
 	GetWorld()->GetTimeSeconds();

@@ -5,6 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "OtvoriVrata.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDoorEvent);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BUILDINGESCAPE_API UOtvoriVrata : public UActorComponent
@@ -17,22 +18,22 @@ public:
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-	void OtvoriVrata();
-	void ZatvoriVrata();
 	
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
-private:
-	UPROPERTY(VisibleAnywhere)
-	float KutOtvaranja = -90.0f;
+	UPROPERTY(BlueprintAssignable)
+	FDoorEvent OnOpen;
 
+	UPROPERTY(BlueprintAssignable)
+	FDoorEvent OnClose;
+
+private:
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PaletaPritiska = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	float DoorCloseDelay = 2.0f;
+	float TriggerMass = 25.0f;
 
 	float LastDoorOpenTime;
 	AActor* Owner;
