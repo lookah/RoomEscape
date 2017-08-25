@@ -24,4 +24,19 @@ public:
 private:
 	// reach koliko mozemo dosegnuti ispred igraca	
 	float Reach = 100.f;
+
+	UPhysicsHandleComponent* FizickiHandler = nullptr;
+	void Zgrabi();
+
+	UInputComponent* InputKomponenta = nullptr;
+	void Otpusti();
+
+	// nadji povezani fizicki handler komponentu
+	void NadjiFizickiHandleKomponentu();
+
+	// nadji input komponentu
+	void NadjiInputKomponentu();
+
+	// Return hit for first physics body in reach
+	const FHitResult GetFirstPhysicsBodyInReach();
 };
