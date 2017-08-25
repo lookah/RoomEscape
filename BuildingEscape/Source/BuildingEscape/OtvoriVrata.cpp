@@ -3,6 +3,8 @@
 #include "BuildingEscape.h"
 #include "OtvoriVrata.h"
 
+#define OUT
+
 
 // Sets default values for this component's properties
 UOtvoriVrata::UOtvoriVrata()
@@ -20,8 +22,6 @@ void UOtvoriVrata::BeginPlay()
 {
 	Super::BeginPlay();
 	Owner = GetOwner();
-
-	AktorKojiOtvara = GetWorld()->GetFirstPlayerController()->GetPawn();
 		
 }
 
@@ -44,9 +44,9 @@ void UOtvoriVrata::TickComponent( float DeltaTime, ELevelTick TickType, FActorCo
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	// provjeri da li je aktor stao na paletu pritiska
-	if (PaletaPritiska->IsOverlappingActor(AktorKojiOtvara)) 
+	if (GetTotalMassOfActorOnPlate() > 25.0f) // TODO Make into a parameter 
 	{	
+		UE_LOG(LogTemp, Warning, TEXT("Otvaram vrata"))
 		OtvoriVrata();
 		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
 	}
@@ -59,3 +59,20 @@ void UOtvoriVrata::TickComponent( float DeltaTime, ELevelTick TickType, FActorCo
 	GetWorld()->GetTimeSeconds();
 }
 
+float UOtvoriVrata::GetTotalMassOfActorOnPlate()
+{
+	float UkupnaMasa = 0.0f;
+
+	// nadji sve aktore na plateu
+	TArray<AActor*> OverlappingActors;
+	PaletaPritiska->GetOverlappingActors(OUT OverlappingActors);
+
+	// iteriraj po svima i zbroji im masu
+	for (const auto* Aktor : OverlappingActors) {
+		UE_LOG(LogTemp, Warning, TEXT("Aktor na plaeti je %s"), *Aktor->GetName())
+		UkupnaMasa += Aktor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Masa je %f"), UkupnaMasa)
+	return UkupnaMasa;
+}
