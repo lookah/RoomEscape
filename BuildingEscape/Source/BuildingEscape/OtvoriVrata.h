@@ -29,7 +29,7 @@ private:
 	float KutOtvaranja = -90.0f;
 
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* PaletaPritiska;
+	ATriggerVolume* PaletaPritiska = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	float DoorCloseDelay = 2.0f;

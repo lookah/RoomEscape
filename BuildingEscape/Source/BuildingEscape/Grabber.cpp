@@ -57,6 +57,7 @@ void UGrabber::Zgrabi() {
 	auto ComponentToGrab = HitResult.GetComponent();
 	auto ActorHit = HitResult.GetActor();
 
+	if (!FizickiHandler) { return; }
 	// ako dodjemo do neceg spojiti s fizickim handleom
 	if (ActorHit) {
 		// spojiti fizicki handle
@@ -72,6 +73,7 @@ void UGrabber::Zgrabi() {
 void UGrabber::Otpusti()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Zgrabi pusten"))
+	if (!FizickiHandler) { return; }
 	FizickiHandler->ReleaseComponent();
 }
 
@@ -82,6 +84,7 @@ void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
 	// ako je fizicki handle spojen
+	if (!FizickiHandler) { return; }
 	if (FizickiHandler->GrabbedComponent)
 		// micati objekt koji je spojen
 		{

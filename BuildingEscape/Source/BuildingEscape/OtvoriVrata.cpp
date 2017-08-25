@@ -65,6 +65,7 @@ float UOtvoriVrata::GetTotalMassOfActorOnPlate()
 
 	// nadji sve aktore na plateu
 	TArray<AActor*> OverlappingActors;
+	if (!PaletaPritiska) { return UkupnaMasa; }
 	PaletaPritiska->GetOverlappingActors(OUT OverlappingActors);
 
 	// iteriraj po svima i zbroji im masu
