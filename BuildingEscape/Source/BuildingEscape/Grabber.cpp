@@ -19,7 +19,6 @@ UGrabber::UGrabber()
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	NadjiFizickiHandleKomponentu();
 	NadjiInputKomponentu();
 	
@@ -27,15 +26,8 @@ void UGrabber::BeginPlay()
 
 void UGrabber::NadjiFizickiHandleKomponentu()
 {
-	// pronacli FizickiHandler
-
 	FizickiHandler = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if (FizickiHandler)
-	{
-		// nadjen
-		UE_LOG(LogTemp, Warning, TEXT("Je nadjen Fizicki Handler %s"), *GetOwner()->GetName())
-	}
-	else
+	if (FizickiHandler == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Nije nadjen Fizicki Handler %s"), *GetOwner()->GetName())
 	}
@@ -44,17 +36,10 @@ void UGrabber::NadjiFizickiHandleKomponentu()
 void UGrabber::NadjiInputKomponentu()
 {
 	// pronadji InputComponent
-
 	InputKomponenta = GetOwner()->FindComponentByClass<UInputComponent>();
 	if (InputKomponenta)
 	{
-		// nadjen
-		UE_LOG(LogTemp, Warning, TEXT("Je nadjen input komponenta %s"), *GetOwner()->GetName())
-
-		// povezi input za Zgrabi
 		InputKomponenta->BindAction("Zgrabi", IE_Pressed, this, &UGrabber::Zgrabi);
-
-		// povezi input za Otpusti
 		InputKomponenta->BindAction("Zgrabi", IE_Released, this, &UGrabber::Otpusti);
 	}
 	else
@@ -65,14 +50,11 @@ void UGrabber::NadjiInputKomponentu()
 
 
 
-void UGrabber::Zgrabi() 
-{
-	UE_LOG(LogTemp, Warning, TEXT("Zgrabi stisnut"))
+void UGrabber::Zgrabi() {
 
 	// Line trace i pokusaj doci u doseg aktora sa physic body collision chanel postavljenim
 	auto HitResult = GetFirstPhysicsBodyInReach();
 	auto ComponentToGrab = HitResult.GetComponent();
-
 	auto ActorHit = HitResult.GetActor();
 
 	// ako dodjemo do neceg spojiti s fizickim handleom
@@ -90,8 +72,6 @@ void UGrabber::Zgrabi()
 void UGrabber::Otpusti()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Zgrabi pusten"))
-
-	// TODO release phyics handle
 	FizickiHandler->ReleaseComponent();
 }
 
@@ -100,31 +80,12 @@ void UGrabber::Otpusti()
 void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
-	/// natjerati PlayerViewpoint -- gdje su i gdje gledaju
-
-	FVector PogledIgracaLokacija;
-	FRotator PogledIgracaRotacija;
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT PogledIgracaLokacija,
-		OUT PogledIgracaRotacija
-	);
-
-	/// logiraj rotaciju i lokaciju 
-
-	/*UE_LOG(LogTemp, Warning, TEXT("Lokacija igraca: %s Rotacija igraca: %s"),
-	*PogledIgracaLokacija.ToString(),
-	*PogledIgracaRotacija.ToString()
-	)*/
-
-	/// prikazati dohvat igraca s crvenom linijom 
-
-	FVector LineTraceEnd = PogledIgracaLokacija + PogledIgracaRotacija.Vector() * Reach;
 
 	// ako je fizicki handle spojen
 	if (FizickiHandler->GrabbedComponent)
 		// micati objekt koji je spojen
 		{
-		FizickiHandler->SetTargetLocation(LineTraceEnd);
+		FizickiHandler->SetTargetLocation(GetReachLineEnd());
 	}
 
 	
@@ -132,35 +93,12 @@ void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 
 const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 {
-	/// natjerati PlayerViewpoint -- gdje su i gdje gledaju
-
-	FVector PogledIgracaLokacija;
-	FRotator PogledIgracaRotacija;
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT PogledIgracaLokacija,
-		OUT PogledIgracaRotacija
-	);
-
-	/// logiraj rotaciju i lokaciju 
-
-	/*UE_LOG(LogTemp, Warning, TEXT("Lokacija igraca: %s Rotacija igraca: %s"),
-	*PogledIgracaLokacija.ToString(),
-	*PogledIgracaRotacija.ToString()
-	)*/
-
-	/// prikazati dohvat igraca s crvenom linijom 
-
-	FVector LineTraceEnd = PogledIgracaLokacija + PogledIgracaRotacija.Vector() * Reach;
-
-	/// Setup query parametre
 	FCollisionQueryParams TraceParametri(FName(TEXT("")), false, GetOwner());
-
-	/// Line-trace (Ray-cast) to reach distance
 	FHitResult LineTracePogodak;
 	GetWorld()->LineTraceSingleByObjectType(
 		OUT LineTracePogodak,
-		PogledIgracaLokacija,
-		LineTraceEnd,
+		GetReachLineStart(),
+		GetReachLineEnd(),
 		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
 		TraceParametri
 	);
@@ -174,5 +112,28 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 	}
 	// ...
 	return LineTracePogodak;
+}
+
+FVector UGrabber::GetReachLineEnd() 
+{
+	/// natjerati PlayerViewpoint -- gdje su i gdje gledaju
+	FVector PogledIgracaLokacija;
+	FRotator PogledIgracaRotacija;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PogledIgracaLokacija,
+		OUT PogledIgracaRotacija
+	);
+	return PogledIgracaLokacija + PogledIgracaRotacija.Vector() * Reach;
+}
+
+FVector UGrabber::GetReachLineStart()
+{
+	FVector PogledIgracaLokacija;
+	FRotator PogledIgracaRotacija;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PogledIgracaLokacija,
+		OUT PogledIgracaRotacija
+	);
+	return PogledIgracaLokacija;
 }
 
